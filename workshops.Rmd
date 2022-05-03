@@ -13,3 +13,19 @@ knitr::opts_chunk$set(echo = TRUE)
 install.packages("janitor")
 ```
 
+week2Workshop3
+```{r}
+library(datasets)
+data("airquality")
+summary(airquality)
+```
+data visualisation
+```{r}
+pairs(airquality)
+```
+prediction
+```{r}
+fit<-lm(Ozone~Solar.R+Wind+Temp, data = airquality)
+summary(fit)
+```
+

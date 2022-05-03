@@ -13,3 +13,27 @@ model <- glm(sexcode~curlen, binomial()) #apply glm model to sexcode&curlen
 xv<-seq(min(curlen), max(curlen), 0.01) #use on your regression model 'Curlen as min'
 yv<-predict(model, list(curlen=xv), type="response") #predict your model
 lines(xv, yv, col="green") #create a line
+
+#week2workshop3
+
+library(tidyverse)
+?summarise
+?group_by
+diamonds
+summarise(diamonds, mean(price))
+
+diamonds%>%
+  group_by(cut)%>%
+  summarise(mean(price))
+
+diamonds%>%
+  group_by(cut)%>%
+  summarise(avg_price=mean(price), avg_carat=mean(carat))
+
+diamonds%>%
+  group_by(carat>1, cut)%>%
+  summarise(avg_price=mean(price))
+
+diamonds%>%
+  group_by(big=carat>1, cut)%>%
+  summarise(avg_price=mean(price))
