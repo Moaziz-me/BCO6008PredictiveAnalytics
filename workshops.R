@@ -37,3 +37,5 @@ diamonds%>%
 diamonds%>%
   group_by(big=carat>1, cut)%>%
   summarise(avg_price=mean(price))
+
+#week2Workshop4

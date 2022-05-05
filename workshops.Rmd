@@ -29,3 +29,4 @@ fit<-lm(Ozone~Solar.R+Wind+Temp, data = airquality)
 summary(fit)
 ```
 
+week2workshop4
