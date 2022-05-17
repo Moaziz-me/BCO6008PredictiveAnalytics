@@ -30,3 +30,22 @@ summary(fit)
 ```
 
 week2workshop4
+
+```{r}
+install.packages("tidymodels")
+install.packages("dplyr")
+install.packages("recipes")
+library(recipes)
+library(rsample)
+library(modeldata)
+library(tidyverse)
+```
+
+
+```{r}
+data("credit_data")
+credit <- credit_data
+credit %>% write_csv("credit_data.csv")
+
+```
+
