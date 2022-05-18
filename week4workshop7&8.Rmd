@@ -1,0 +1,24 @@
+---
+title: "week4workshop7and8"
+author: "Mohammad Aziz"
+date: '2022-05-17'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+devtools::install_github("thebioengineer/tidytuesdayR")
+
+tuesdata <- tidytuesdayR::tt_load(2020, week = 20)
+
+volcano <- tuesdata$volcano
+
+
+library(tidyverse)
+
+glimpse(volcano)
+```
+

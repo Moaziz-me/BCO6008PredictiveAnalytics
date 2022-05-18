@@ -131,7 +131,116 @@ view(mtcars)
 
 #week2workshop6
 
+#descriptive data analysis 
 install.packages("xlsx")
 library(xlsx)
+data<-read.csv("commerce.csv")
+print(data)
+#header in the data file 
+head(data)
+#file structure
+str(data)
+min(data$ProductPrice)
+max(data$ShippingFee)
+max(data$ProductPrice) 
+range(data$ProductPrice)
+max(data$ProductPrice)-min(data$ProductPrice)
+mean(data$ProductPrice)
+median(data$ProductPrice)
+quantile(data$ProductPrice) 
+quantile(data$ProductPrice, 0.5)
+quantile(data$ProductPrice, 0.75)
+IQR(data$ProductPrice)
+sd(data$ProductPrice)
+summary(data)
+View(data)
+#CV
+sd(data$ProductPrice)/mean(data$ProductPrice)
+sort(data$OrderID)
+cor(data$ProductPrice, data$ShippingFee)
+barplot(data$ProductPrice, data$ShippingFee)
+hist(data$ProductPrice)
+boxplot(data$ProductPrice)
 
-data<-read_excel('commerce.xlsx')
+# Get the Data
+
+# Read in with tidytuesdayR package 
+# Install from CRAN via: install.packages("tidytuesdayR")
+# This loads the readme and all the datasets for the week of interest
+
+# Either ISO-8601 date or year/week works!
+
+install.packages("tidytuesdayR")
+
+tuesdata <- tidytuesdayR::tt_load('2020-07-14')
+tuesdata <- tidytuesdayR::tt_load(2020, week = 29)
+
+astronauts <- tuesdata$astronauts
+
+# Or read in the data manually
+
+astronauts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-07-14/astronauts.csv')
+
+library(tidyverse)
+install.packages("janitor")
+library(janitor)
+library(knitr)
+
+astronauts%>% 
+  clean_names() %>% 
+  filter(!is.na(number)) %>%  # remove last row (all values are NA)
+  mutate(
+    sex = if_else(sex == "M", "male", "female"),
+    military_civilian = if_else(military_civilian == "Mil", "military", "civilian")
+  )
+
+astronauts %>%
+  mutate(year_of_mission = 10 * (year_of_mission %/% 10),
+         year_of_mission = factor(year_of_mission))%>%
+  ggplot(aes(year_of_mission, hours_mission,
+             fill = year_of_mission, color = year_of_mission))+
+  geom_boxplot(show.legend = F, alpha = 0.2, size = 0.5)+
+  scale_y_log10()+
+  labs(x = NULL, y = "Duration of mission in hours")
+
+astronauts_df <- astronauts %>%
+  select(name, mission_title, hours_mission,
+         military_civilian, occupation, year_of_mission, in_orbit) %>%
+  mutate(in_orbit = case_when(str_detect(in_orbit, "^Salyut") ~ "Salyut",
+                              str_detect(in_orbit, "^STS") ~ "STS",
+                              TRUE ~ in_orbit),
+         occupation = str_to_lower(occupation))%>%
+  filter(hours_mission > 0)%>%
+  mutate(hours_mission = log(hours_mission)) %>%
+  na.omit()
+
+library(tidymodels)
+
+set.seed(123)
+astro_split <- initial_split(astronauts_df, strata = hours_mission)
+astro_train <- training(astro_split)
+astro_test <- testing(astro_split)
+
+astro_recipe <- recipe(hours_mission ~ ., data = astro_train) %>%
+  update_role(name, mission_title, new_role = "id") %>%
+  step_other(occupation, in_orbit, threshold = 0.005) %>%
+  step_dummy(all_nominal(), -has_role("id"))
+
+astro_recipe %>% prep() %>% juice()
+
+install.packages("baguette")
+library(baguette)
+
+astro_wf <- workflow() %>%
+  add_recipe(astro_recipe)
+
+tree_spec <- bag_tree() %>%
+  set_engine("rpart", times = 25) %>%
+  set_mode("regression")
+
+mars_spec <- bag_mars() %>%
+  set_engine("earth", times = 25) %>%
+  set_mode("regression")
+
+astro_wf %>%
+  add_model(tree_spec)
